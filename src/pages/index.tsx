@@ -38,7 +38,7 @@ const Index = () => {
         {!data && fetching ? (
           <Box>loading...</Box>
         ) : (
-          data.posts.map((post) => (
+          data?.posts.map((post) => (
             <Box p={5} shadow="md" borderWidth="1px" key={post.id}>
               <Heading fontSize="xl">{post.title}</Heading>
               <Text
@@ -56,7 +56,7 @@ const Index = () => {
           ))
         )}
       </Stack>
-      {data.posts.length ? (
+      {data?.posts.length ? (
         <Flex my={8}>
           <Button m="auto" isLoading={fetching}>
             More...
