@@ -1,52 +1,68 @@
-import { Box, Button, FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
+import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
-import React from "react"
+import React from "react";
+
 import { InputField } from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
 import { useRegisterMutation } from "../generated/graphql";
+import { createUrqlClient } from "../utils/createUrqlClient";
 import { toErrorMap } from "../utils/toErrorMap";
 
-interface registerProps {}
-
-const register: React.FC<registerProps> = ({}) => {
+const Register: React.FC = () => {
   const router = useRouter();
-  const [,register] = useRegisterMutation();
+  const [, register] = useRegisterMutation();
+
   return (
     <Wrapper variant="small">
       <Formik
-        initialValues={{ username: "" as string, password: "" as string }}
+        initialValues={{ username: "", password: "", email: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await register(values);
+          const response = await register({ options: values });
 
-          if (response.data?.register.errors) {
-            setErrors(toErrorMap(response.data.register.errors));
+          if (response.data?.register.errors?.length) {
+            setErrors(toErrorMap(response.data?.register.errors));
           } else if (response.data?.register.user) {
-            router.push("/");
+            router.push("/", {});
           }
+
+          return response;
         }}
       >
         {({ isSubmitting }) => (
           <Form>
-            <InputField 
-              name="username" 
-              placeholder="username" 
-              label="Username" 
+            <InputField
+              name="username"
+              placeholder="Choose a nice username"
+              label="Username"
             />
+
             <Box mt={4}>
-              <InputField 
-                name="password" 
-                placeholder="password"
-                label="Password" 
-                type="password" 
+              <InputField
+                name="email"
+                placeholder="Your best email"
+                label="Email"
               />
             </Box>
-            <Button mt={4} type="submit" colorScheme="teal" isLoading={isSubmitting}> register</Button>
+
+            <Box mt={4}>
+              <InputField
+                name="password"
+                placeholder="Super secret password"
+                label="Password"
+                type="password"
+              />
+            </Box>
+
+            <Button mt={4} color="teal" type="submit" isLoading={isSubmitting}>
+              Register
+            </Button>
           </Form>
         )}
       </Formik>
     </Wrapper>
-  ); 
-}
+  );
+};
 
-export default register;
+export default withUrqlClient(createUrqlClient)(Register);
