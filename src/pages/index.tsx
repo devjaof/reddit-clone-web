@@ -10,7 +10,11 @@ import {
 import { withUrqlClient } from "next-urql";
 
 import Layout from "../components/Layout";
-import { usePostsQuery } from "../generated/graphql";
+import {
+  useDeletePostMutation,
+  usePostsQuery,
+  useUpdatePostMutation,
+} from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = () => {
@@ -24,13 +28,16 @@ const Index = () => {
     return <div>Something has failed... :/</div>;
   }
 
+  const [, deletePost] = useDeletePostMutation();
+  const [, updatePost] = useUpdatePostMutation();
+
   return (
     <Layout>
-      <br />
-
       <Flex mb={4} align="center">
         <Box ml="auto">
-          <Link href="/create-post">New post</Link>
+          <Button>
+            <Link href="/create-post">New post</Link>
+          </Button>
         </Box>
       </Flex>
 
@@ -39,30 +46,33 @@ const Index = () => {
           <Box>loading...</Box>
         ) : (
           data?.posts.map((post) => (
-            <Box p={5} shadow="md" borderWidth="1px" key={post.id}>
-              <Heading fontSize="xl">{post.title}</Heading>
-              <Text
-                mt={4}
-                style={{
-                  width: "200px",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {post.body}
-              </Text>
+            <Box
+              p={5}
+              shadow="md"
+              borderWidth="1px"
+              key={post.id}
+              position="relative"
+            >
+              <Box position="absolute" right={1} top={1}>
+                <Button mr={2}>edit</Button>
+                <Button
+                  onClick={async () => {
+                    await deletePost({ id: post.id });
+
+                    window.location.reload();
+                  }}
+                >
+                  delete
+                </Button>
+              </Box>
+              <Box>
+                <Heading fontSize="xl">{post.title}</Heading>
+                <Text mt={4}>{post.body}</Text>
+              </Box>
             </Box>
           ))
         )}
       </Stack>
-      {data?.posts.length ? (
-        <Flex my={8}>
-          <Button m="auto" isLoading={fetching}>
-            More...
-          </Button>
-        </Flex>
-      ) : null}
     </Layout>
   );
 };
