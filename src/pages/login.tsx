@@ -23,17 +23,17 @@ const Login: React.FC = () => {
             password: values.password,
           });
 
-          // if (response.data?.login.errors?.length) {
-          //   setErrors(toErrorMap(response.data?.login.errors));
-          // } else if (response.data?.login.user) {
-          //   const nextRouter = router.query.next;
+          if (response.data?.login.errors?.length) {
+            setErrors(toErrorMap(response.data?.login.errors));
+          } else if (response.data?.login.user) {
+            const nextRouter = router.query.next;
 
-          //   if (typeof nextRouter === "string") {
-          //     router.push(nextRouter, { pathname: nextRouter });
-          //   } else {
-          //     router.push("/", { pathname: "/" });
-          //   }
-          // }
+            if (typeof nextRouter === "string") {
+              router.push(nextRouter, { pathname: nextRouter });
+            } else {
+              router.push("/", { pathname: "/" });
+            }
+          }
 
           return response;
         }}

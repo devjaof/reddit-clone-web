@@ -12,9 +12,9 @@ import { useState } from "react";
 import { PostFormModal } from "../components/PostFormModal";
 
 import Layout from "../components/Layout";
-import { useDeletePostMutation, usePostsQuery } from "../generated/graphql";
+import { usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
-import { useRouter } from "next/router";
+import { PostCard } from "../components/PostCard";
 
 const Index = () => {
   const [{ data, fetching }] = usePostsQuery({
@@ -26,15 +26,6 @@ const Index = () => {
   if (!fetching && !data) {
     return <div>Something has failed... :/</div>;
   }
-
-  const router = useRouter();
-
-  const [, deletePost] = useDeletePostMutation();
-
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const handleEditModal = () => {
-    setOpenEditModal(!openEditModal);
-  };
 
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const handleCreateModal = () => {
@@ -53,42 +44,7 @@ const Index = () => {
         {!data && fetching ? (
           <Box>loading...</Box>
         ) : (
-          data?.posts.map((post) => (
-            <>
-              <Box
-                p={5}
-                shadow="md"
-                borderWidth="1px"
-                key={post.id}
-                position="relative"
-              >
-                <Box position="absolute" right={1} top={1}>
-                  <Button mr={2} onClick={handleEditModal}>
-                    <Text>edit</Text>
-                  </Button>
-                  <Button
-                    onClick={async () => {
-                      await deletePost({ id: post.id });
-
-                      router.reload();
-                    }}
-                  >
-                    <Text>delete</Text>
-                  </Button>
-                </Box>
-                <Box>
-                  <Heading fontSize="xl">{post.title}</Heading>
-                  <Text mt={4}>{post.body}</Text>
-                </Box>
-              </Box>
-              <PostFormModal
-                key={post.id}
-                isOpen={openEditModal}
-                onClose={handleEditModal}
-                post={post}
-              />
-            </>
-          ))
+          data?.posts.map((post) => <PostCard post={post} />)
         )}
       </Stack>
       <PostFormModal isOpen={openCreateModal} onClose={handleCreateModal} />
