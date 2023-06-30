@@ -10,11 +10,7 @@ import {
 import { withUrqlClient } from "next-urql";
 
 import Layout from "../components/Layout";
-import {
-  useDeletePostMutation,
-  usePostsQuery,
-  useUpdatePostMutation,
-} from "../generated/graphql";
+import { useDeletePostMutation, usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = () => {
@@ -29,7 +25,6 @@ const Index = () => {
   }
 
   const [, deletePost] = useDeletePostMutation();
-  const [, updatePost] = useUpdatePostMutation();
 
   return (
     <Layout>
@@ -54,7 +49,9 @@ const Index = () => {
               position="relative"
             >
               <Box position="absolute" right={1} top={1}>
-                <Button mr={2}>edit</Button>
+                <Button mr={2}>
+                  <Link href="/edit-post">edit</Link>
+                </Button>
                 <Button
                   onClick={async () => {
                     await deletePost({ id: post.id });
